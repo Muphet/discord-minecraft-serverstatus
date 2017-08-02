@@ -55,7 +55,7 @@ client.on('message', message => {
 });
 
 function getStatus(port, label, cb) {
-    mc.ping_fefd_udp({host: '198.27.80.142', port: port}, function(err, response) {
+    mc.ping_fefd_udp({host: 'localhost', port: port}, function(err, response) {
         if (err == null) {
             var playerlist = "";
             if (response.players.length > 0){
