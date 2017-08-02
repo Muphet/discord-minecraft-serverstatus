@@ -37,6 +37,8 @@ client.on('message', message => {
         if (server === "all") {
             for (i in servers){
                 getStatus(servers[i].port, servers[i].label, function(response) {
+                    //remove author command invoke message (requires channel permission "MANAGE_MESSAGES")
+                    message.delete().catch(err=>client.funcs.log(err, "error"));
                     message.reply(response);
                 });
             }
@@ -44,9 +46,11 @@ client.on('message', message => {
             for (i in servers){
                 reply += i + " ";
             }
+            message.delete().catch(err=>client.funcs.log(err, "error"));
             message.reply("Nope! Valid servers: " + reply);
         } else {
             getStatus(servers[server].port, servers[server].label, function(response) {
+                message.delete().catch(err=>client.funcs.log(err, "error"));
                 message.reply(response);
             });
         }
