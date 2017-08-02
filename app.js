@@ -2,21 +2,13 @@ const mc = require('minecraft-ping');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-client.login('tokenhere');
+client.login('pastetokenhere');
 
-var command = '!serverstatus';
+var command = '!ss';
 var servers = {
     "hub" : {
         "label" : "Hub",
         "port" : "24460"
-    },
-    "dw20" : {
-        "label" : "Direwolf20",
-        "port" : "24461"
-    },
-    "sf3" : {
-        "label" : "SkyFactory 3",
-        "port" : "24462"
     },
     "ultimate" : {
         "label" : "Ultimate",
@@ -26,6 +18,14 @@ var servers = {
         "label" : "Beyond",
         "port" : "24464"
     },
+    "age" : {
+        "label" : "Stone Age",
+        "port" : "24461"
+    },
+    "aoe" : {
+        "label" : "Age of Engineering",
+        "port" : "24468"
+    },
 };
 
 client.on('message', message => {
@@ -33,12 +33,10 @@ client.on('message', message => {
         var msgarr = message.content.split(" ");
         var server = msgarr[1];
         var reply = "";
-        
+        message.delete().catch(err=>client.funcs.log(err, "error"));
         if (server === "all") {
             for (i in servers){
                 getStatus(servers[i].port, servers[i].label, function(response) {
-                    //remove author command invoke message (requires channel permission "MANAGE_MESSAGES")
-                    message.delete().catch(err=>client.funcs.log(err, "error"));
                     message.reply(response);
                 });
             }
@@ -46,11 +44,9 @@ client.on('message', message => {
             for (i in servers){
                 reply += i + " ";
             }
-            message.delete().catch(err=>client.funcs.log(err, "error"));
             message.reply("Nope! Valid servers: " + reply);
         } else {
             getStatus(servers[server].port, servers[server].label, function(response) {
-                message.delete().catch(err=>client.funcs.log(err, "error"));
                 message.reply(response);
             });
         }
@@ -59,7 +55,7 @@ client.on('message', message => {
 });
 
 function getStatus(port, label, cb) {
-    mc.ping_fefd_udp({host: 'localhost', port: port}, function(err, response) {
+    mc.ping_fefd_udp({host: '198.27.80.142', port: port}, function(err, response) {
         if (err == null) {
             var playerlist = "";
             if (response.players.length > 0){
@@ -71,8 +67,17 @@ function getStatus(port, label, cb) {
                     }
                 }
             }
-            var reply = ":green_heart: " + label + " server is online! Players (" + response.numPlayers + "/" + response.maxPlayers +") " + playerlist;
-            cb(reply);
+             var embed = {
+                            "color": 7844437,
+                            "author": {
+                                "name": client.user.username,
+                                "icon_url": client.user.avatarURL
+                            },
+                            "title": label + "Server Status",
+                            "description": "Players online (" + response.numPlayers + "/" + response.maxPlayers + ")",
+                            "timestamp": new Date().toISOString()
+                        };
+            cb({embed});
         } else {
             var reply = ":red_circle: " + label + " server is offline!";
             cb(reply);
